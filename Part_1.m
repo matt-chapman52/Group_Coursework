@@ -1,15 +1,14 @@
 clc
 clear
 
+data = readtable('Pickup Data Set3.xls'); % Importing excel spreadsheet into Maltab
 
-data = readtable('Pickup Data Set3.xls');
-
-data = standardizeMissing(data,'Do Not Use Data For This Row');
+data = standardizeMissing(data,'Do Not Use Data For This Row');  % Telling Matlab to treat the 'Do Not Use' as missing Data
 
 cleanedData = rmmissing(data);
 
 handForce = [];
-arrayCleanData = table2array(cleanedData(:,8));
+arrayCleanData = table2array(cleanedData(:,8)); % Creating an array of just the force to then calculate the force at the users hand
 
 for a = 1:height(cleanedData)
     
@@ -17,119 +16,79 @@ for a = 1:height(cleanedData)
     handForce(a,1) = calcForce;
     
 end
+
 handForce = table(handForce);
-Tnew = [cleanedData, handForce];
-%%%Plotting Forcce produced by the hand against flow rate
+Tnew = [cleanedData, handForce];   %Adding the force at users hand to the table
 
-handForce1 = [];
-flowRate1 = [];
-handForce2 = [];
-flowRate2 = [];
-handForce3 = [];
-flowRate3 = [];
-
-for b = 1: height(cleanedData)
-    if strcmp (Tnew.SurfaceType(b), 'Shag')
-        handForce1 = [handForce1 ; Tnew.handForce(b)];
-        flowRate1 = [flowRate1 ; Tnew.FlowRate_LPS(b)];
-    elseif strcmp (Tnew.SurfaceType(b), 'Hard Floor')
-        handForce2 = [handForce2 ; Tnew.handForce(b)];
-        flowRate2 = [flowRate2 ; Tnew.FlowRate_LPS(b)];
-    else 
-        handForce3 = [handForce3 ; Tnew.handForce(b)];
-        flowRate3 = [flowRate3 ; Tnew.FlowRate_LPS(b)];
-    end
-    
-end
+[shag, hardFloor, plush] = floorType(Tnew);  %% Calling floor type function
 
 figure
-plot(handForce1, flowRate1, '.m')
-hold on
-plot(handForce2, flowRate2, '.b')
-plot(handForce3, flowRate3, '.r')
-grid on
+plot(shag.handForce, shag.flowRate, '.m')
+hold, grid on
+plot(hardFloor.handForce, hardFloor.flowRate, '.b')
+plot(plush.handForce, plush.flowRate, '.r')
 legend('Shag Carpet','Hard Floor','Plush Carpet')
 xlabel ('Push Force Produced by the users hands /N')
 ylabel ('Flow Rate /LPS')
+% Plotting of first graph with legend, labels etc.
 
-
-[calval] = plotG(handForce1, flowRate1, '--m') ;
-fprintf('The maximum flowrate for 50N is: %f /LPS \n', calval);
-
-
-plotG(handForce2, flowRate2, '--b') ;
-
-
-
-plotG(handForce3, flowRate3, '--r') ;
-
-
-%%% From viual inspection, shag carpet is the decided for the maximum flow
-%%% rate under 50N of force applied by the hand.
-
-
-%%%Plotting Forcce produced by the hand against flow rate
-
-hand1 = [];
-pick1 = [];
-hand2 = [];
-pick2 = [];
-hand3 = [];
-pick3 = [];
-
-for b = 1: height(cleanedData)
-    if strcmp (Tnew.SurfaceType(b), 'Shag')
-        hand1 = [hand1 ; Tnew.handForce(b)];
-        pick1 = [pick1 ; Tnew.Pickup__(b)];
-    elseif strcmp (Tnew.SurfaceType(b), 'Hard Floor')
-        hand2 = [hand2 ; Tnew.handForce(b)];
-        pick2 = [pick2 ; Tnew.Pickup__(b)];
-    else 
-        hand3 = [hand3 ; Tnew.handForce(b)];
-        pick3 = [pick3 ; Tnew.Pickup__(b)];
-    end
-    
-end
-
-
-
-
+[calcval] = plotG(shag.handForce, shag.flowRate, '--m') ;
+fprintf('The maximum flowrate for 50N, shag is: %f /LPS \n', calcval);
+[calcval] = plotG(hardFloor.handForce, hardFloor.flowRate, '--b') ;
+fprintf('The maximum flowrate for 50N, hard floor is: %f /LPS \n', calcval);
+[calcval] = plotG(plush.handForce, plush.flowRate, '--r') ;
+fprintf('The maximum flowrate for 50N, plush is: %f /LPS \n', calcval);
 figure
-plot(hand1, pick1, '.m')
-hold on
-plot(hand2, pick2, '.b')
-plot(hand3, pick3, '.r')
-grid on
+plot(shag.handForce, shag.pickup, '.m')
+hold, grid on
+plot(hardFloor.handForce, hardFloor.pickup, '.b')
+plot(plush.handForce, plush.pickup, '.r')
 legend('Shag Carpet','Hard Floor','Plush Carpet')
 xlabel ('Push Force Produced by the users hands /N')
 ylabel ('Pickup /%')
+%%% Plotting of Second graph with labels and titles etc.
 
 
+[calcval] = plotG(shag.handForce, shag.pickup, '--m') ;
+fprintf('The max pickup for shag carpet is: %f \n', calcval);
 
-[calval] = plotG(hand1, pick1, '--m') ;
-fprintf('The max pickup for shag carpet is: %f \n', calval);
+[calcval] = plotG(hardFloor.handForce, hardFloor.pickup, '--b') ;
+fprintf('The max pick up for hard floor is: %f \n', calcval);
 
+[calcval] = plotG(plush.handForce, plush.pickup, '--r') ;
+fprintf('The max pick up for plush carpet is: %f \n', calcval);
+%Plotting of line of best fit and using this line to interpolate values.
 
-
-
-
-[calval] = plotG(hand2, pick2, '--b') ;
-fprintf('The max pick up for hard floor is: %f \n', calval);
-
-
-
-[calval] = plotG(hand3, pick3, '--r') ;
-fprintf('The max pick up for plush carpet is: %f \n', calval);
-
-
-function [calval] = plotG(var1, var2, col )
-
-
+function [calcval] = plotG(var1, var2, col )
 p = polyfit(var1, var2, 1);
 yhat = polyval(p, var1);
 plot(var1, yhat, col);
+calcval = polyval(p,50);
+%%%Function calls the two x and y variables, uses polyfit and polyval to
+%%%plot a line of best fit. Calval uses linear interpolation to find the
+%%%corresponding x or y value.
+end
 
-calval = polyval(p,50);
+
+function [shag, hardFloor, plush] = floorType(Tnew)
+headerNames = {'handForce', 'flowRate', 'pickup'};
+shag = array2table(zeros(0,3));
+shag.Properties.VariableNames = headerNames;
+hardFloor = array2table(zeros(0,3));
+hardFloor.Properties.VariableNames = headerNames;
+plush = array2table(zeros(0,3));
+plush.Properties.VariableNames = headerNames;
+%Creating of expty tables for each floor type.
+for b = 1: height(Tnew)
+    if strcmp (Tnew.SurfaceType(b), 'Shag')
+        shag(end+1,:) = {Tnew.handForce(b), Tnew.FlowRate_LPS(b), Tnew.Pickup__(b)};
+    elseif strcmp (Tnew.SurfaceType(b), 'Hard Floor')
+        hardFloor(end+1,:) = {Tnew.handForce(b), Tnew.FlowRate_LPS(b), Tnew.Pickup__(b)};
+    else
+        plush(end+1,:) = {Tnew.handForce(b), Tnew.FlowRate_LPS(b),Tnew.Pickup__(b)};
+    end  
+end 
+% Loop to sort the data into the correct table based on floor type.
 end
 
 

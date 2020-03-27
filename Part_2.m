@@ -1,45 +1,30 @@
-%%BRANCH TEST
 clc
 clear
 
-dataFile = "HospitalData3.xlsx";    % Stores data set filename
-dataSet = xlsread(dataFile);        % Reads the dataset and stores data into a matrix
+dataFile = "HospitalData3.xlsx";                        % Stores data set filename
+dataSet = readtable(dataFile);                          % Reads the dataset and stores data into a table
 
-populations = dataSet(:,1);         % Assigns the first column to populations array
+percentageSet = struct;                                 % Initialises percentageSet as a struct
+populations = table2array(dataSet(:,2));                % Converts the table section containing population data into an array and stores to "populations2 array
 
-days = ["Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"];
-months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"};
-periods = [days, months];           % Creates a matrix containing days and months
-meanPercentages = [];               % Creates empty arrays to store percentages     
-medianPercentages = [];             % ^^
+months = [1:96];                                        % Constructs array of intergers from 1 to 96 (length of dataset) **NOTE could use length()?
 
+for i = 1:96;                                           % Main loop iterates through each data point of the set  
+daysNums = dataSet{i, 3:9};                             % Extracts the data containing the patient numbers for each day of the week
+daysNumsAll(i) = sum(daysNums);                         % Sums the daysnums array to find total monthly patients 
+monthlyPercentage = (sum(daysNums)/ populations(i))*100;   % Calculates and stores the average monthly patients to the percentage struct **NOTE use daysnumsAll
+percentageSet(i).monthPercent = monthlyPercentage;
 
-for i = 1:length(periods);          % Main loop cycles through each day of week and month of year
-tempPercentages = [];               % Empty array re-initialised on each iteration to store temporary percentages
-
-    
-
-    if find(days == periods(i))                                     % Block within IF executed if the period element is found in "days" array
-        for j = 1:length(dataSet);                                  % Sub loop cycles through each data point, or month, of the dataset
-            monthPopulation = populations(j);                       % The contained block calculates the percentage of population in hospital on the given day
-            monthPatients = dataSet(j,i+1);
-            monthlyPercent = (monthPatients/monthPopulation)*100;
-            tempPercentages(j) = monthlyPercent;                    % This percentage set is contained into "monthlyPercent" array **NOTE - unused var?
-        end
-    else                                                            % Block within IF executed if the period element is NOT found in "days" array i.e. a month
-        for j = 1:length(dataSet)/12;                               % Sub loop cycles through each data point for the given month e.g. every Jan or every May etc.
-            monthPopulation = populations(j);                       % The contained block calculated the percentage of the population in hospital for the entire month 
-            monthPatients = sum(dataSet(12*(j-1)+(i-7),2:end));
-            monthlyPercent = (monthPatients/monthPopulation)*100;
-            tempPercentages(j) = monthlyPercent;                    % This percentage set is contained into monthlyPercent array **NOTE - unused var?
-        end
+    for j = 1:7;                                        % Sub loop calculates percentage of population by day and stores to percentage set struct
+        percentageSet(i).daysPercent(j) = (dataSet{i,j+2}/populations(i))*100; % **NOTE this does not consider 4 weeks per month...
     end
-        
-    
-    meanPercentages(i) = mean(tempPercentages);                     % Each period's percentage data is stored into the global percentage arrays
-    medianPercentages(i) = median(tempPercentages);
- 
+   
 end
 
-averageTable = table(periods.', meanPercentages.', medianPercentages.','VariableNames',{'Period','MeanPercentages','MedianPercentages'}); % Average data table generated from percentage data
-         
+plot(months, [percentageSet(1:96).monthPercent]);       % Plots month-by-month percentage against months
+figure;
+plot(months, populations);                              % Plots population aginst months
+xlabel("Months After First Data Point");
+ylabel("Population of Town")
+yyaxis right;
+plot(months, daysNumsAll);                              % Plots patients in hospital against months

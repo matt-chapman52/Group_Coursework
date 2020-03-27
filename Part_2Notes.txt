@@ -8,5 +8,10 @@ Version 2.0
 	- Population and percentage of population in hospital is plotted
 	- Useful insight is provided as per brief
 	- Structure is used to store the different percentages etc.
+		
+		V2.1
+		- Added polyfit plotting 
+		- Replaced "magic number" with height of table for 
+		compatability
 
 	

@@ -52,26 +52,21 @@ legend('Shag Carpet','Hard Floor','Plush Carpet')
 xlabel ('Push Force Produced by the users hands /N')
 ylabel ('Flow Rate /LPS')
 
-p = polyfit(handForce1, flowRate1, 1);
-yhat = polyval(p, handForce1);
-plot(handForce1, yhat, '--m');
-calval = polyval(p,50);
 
-
+[calval] = plotG(handForce1, flowRate1, '--m') ;
 fprintf('The maximum flowrate for 50N is: %f /LPS \n', calval);
 
-q = polyfit(handForce2, flowRate2, 1);
-yhat2 = polyval(q, handForce2);
-plot(handForce2, yhat2, '--b');
+
+plotG(handForce2, flowRate2, '--b') ;
 
 
-r = polyfit(handForce3, flowRate3, 1);
-yhat3 = polyval(r, handForce3);
-plot(handForce3, yhat3, '--r');
+
+plotG(handForce3, flowRate3, '--r') ;
 
 
 %%% From viual inspection, shag carpet is the decided for the maximum flow
 %%% rate under 50N of force applied by the hand.
+
 
 %%%Plotting Forcce produced by the hand against flow rate
 
@@ -111,27 +106,32 @@ ylabel ('Pickup /%')
 
 
 
-p = polyfit(hand1, pick1, 1);
-yhat = polyval(p, hand1);
-plot(hand1, yhat, '--m');
-calval = polyval(p,50);
+[calval] = plotG(hand1, pick1, '--m') ;
 fprintf('The max pickup for shag carpet is: %f \n', calval);
 
 
 
-q = polyfit(hand2, pick2, 1);
-yhat2 = polyval(q, hand2);
-plot(hand2, yhat2, '--b');
 
-calval = polyval(p,50);
+
+[calval] = plotG(hand2, pick2, '--b') ;
 fprintf('The max pick up for hard floor is: %f \n', calval);
 
-r = polyfit(hand3, pick3, 1);
-yhat3 = polyval(r, hand3);
-plot(hand3, yhat3, '--r');
+
+
+[calval] = plotG(hand3, pick3, '--r') ;
+fprintf('The max pick up for plush carpet is: %f \n', calval);
+
+
+function [calval] = plotG(var1, var2, col )
+
+
+p = polyfit(var1, var2, 1);
+yhat = polyval(p, var1);
+plot(var1, yhat, col);
 
 calval = polyval(p,50);
-fprintf('The max pick up for plush carpet is: %f \n', calval);
+end
+
 
 
 

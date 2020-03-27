@@ -1,4 +1,5 @@
 %%Commit test12%%
+%%checkout test
 
 clc
 clear

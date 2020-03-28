@@ -8,11 +8,11 @@ data = standardizeMissing(data,'Do Not Use Data For This Row');  % Telling Matla
 cleanedData = rmmissing(data);
 
 handForce = [];
-arrayCleanData = table2array(cleanedData(:,8)); % Creating an array of just the force to then calculate the force at the users hand
+pushForceArray = table2array(cleanedData(:,8)); % Creating an array of just the force to then calculate the force at the users hand
 
 for a = 1:height(cleanedData)
     
-     calcForce = arrayCleanData(a, 1) / cos((55/180) * pi);
+     calcForce = pushForceArray(a, 1) / cos((55/180) * pi);
     handForce(a,1) = calcForce;
     
 end
@@ -78,7 +78,7 @@ hardFloor = array2table(zeros(0,3));
 hardFloor.Properties.VariableNames = headerNames;
 plush = array2table(zeros(0,3));
 plush.Properties.VariableNames = headerNames;
-%Creating of expty tables for each floor type.
+%Creating of empty tables for each floor type.
 for b = 1: height(Tnew)
     if strcmp (Tnew.SurfaceType(b), 'Shag')
         shag(end+1,:) = {Tnew.handForce(b), Tnew.FlowRate_LPS(b), Tnew.Pickup__(b)};

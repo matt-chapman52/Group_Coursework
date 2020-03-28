@@ -1,42 +1,75 @@
 clc
+close all
 clear
 
 dataFile = "HospitalData3.xlsx";                        % Stores data set filename
 dataSet = readtable(dataFile);                          % Reads the dataset and stores data into a table
 height = height(dataSet);
 
-percentageSet = struct;                                 % Initialises percentageSet as a struct
-populations = table2array(dataSet(:,2));                % Converts the table section containing population data into an array and stores to "populations2 array
+plotData = struct;                                 % Initialises percentageSet as a struct
+plotData.populations = (table2array(dataSet(:,2)))';                % Converts the table section containing population data into an array and stores to "populations2 array
 
 months = [1:height];                                        % Constructs array of intergers from 1 to 96 (length of dataset) **NOTE could use length()?
+days = [1:28*height];
 
-for i = 1:height;                                           % Main loop iterates through each data point of the set  
-daysNums = dataSet{i, 3:9};                             % Extracts the data containing the patient numbers for each day of the week
-daysNumsAll(i) = sum(daysNums);                         % Sums the daysnums array to find total monthly patients 
-monthlyPercentage = (daysNumsAll(i)/ populations(i))*100;   % Calculates and stores the average monthly patients to the percentage struct 
-percentageSet(i).monthPercent = monthlyPercentage;
+for i = 1:height                                           % Main loop iterates through each data point of the set  
 
-    for j = 1:7;                                        % Sub loop calculates percentage of population by day and stores to percentage set struct
-        percentageSet(i).daysPercent(j) = (dataSet{i,j+2}/populations(i))*100; % **NOTE this does not consider 4 weeks per month...
+    monthData = dataSet{i, 2:9};
+
+    plotData.monthlyPercentages(i) = calcMonthPercent(monthData);
+    plotData.monthlyPatients(i) = sum(monthData(2:8));
+
+    for j = 0:3
+        for k = 1:7
+            plotData.dailyPercentages(28*(i-1)+(7*j)+k) = calcDayPercent(monthData, k);
+            plotData.dailyPatients(28*(i-1)+(7*j)+k) = monthData(k+1);
+        end
     end
    
 end
 
-plot(months, [percentageSet(1:height).monthPercent]);       % Plots month-by-month percentage against months
 figure;
-plot(months, populations);                              % Plots population aginst months
-xlabel("Months After First Data Point");
-ylabel("Population of Town")
-yyaxis right;
-plot(months, daysNumsAll);                              % Plots patients in hospital against months
+plot(months, plotData.monthlyPercentages);           % Plots month-by-month percentage against months
 
+figure;
+ax1 = gca;
+line(months, plotData.populations, 'Parent', ax1);                  % Plots population aginst months
+xlabel("Months After First Data Point");
+ylabel("Population of Town");
+yyaxis right;
+ax1.YLim = [0 20]
+line(months, plotData.monthlyPercentages, 'Parent', ax1);
+
+
+ax2 = axes('Position', get(ax1, 'Position'),'XAxisLocation','top', 'YAxisLocation','right', 'Color', 'none');
+ax2.YLim = [0 20];
+line(days, plotData.dailyPercentages, 'Parent', ax2);
+
+figure;
+plot(days, plotData.dailyPercentages);               % Plots patients in hospital against months
+
+%{
 hold all;
 
-p = polyfit(months, daysNumsAll, 1);
-y1 = polyval(p, months);
-plot(months, y1);
+p = polyfit(days, plotData.dailyPercentages, 1);
+y1 = polyval(p, days);
+plot(days, y1);
 ylabel("Patients In Hospital By Month");
+
 
 for k = 1:8;
     xline(12*k);
+end
+%}
+
+function monthlyPercentage = calcMonthPercent(monthData)
+    monthPop = monthData(1);
+    monthPatients = sum(monthData(2:8))*4;
+    monthlyPercentage = (monthPatients/monthPop)*100;
+end
+
+function dailyPercentage = calcDayPercent(monthData, k)
+    monthPop = monthData(1);
+    dayPatients = monthData(k+1);
+    dailyPercentage = (dayPatients/monthPop)*100;
 end

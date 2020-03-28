@@ -1,6 +1,7 @@
 Version 1.0
 	- Cycles through data set, extracts averages over the whole period
-	- Proves data can successfully be imported and processed, however 		output does not provide useful insight required as per 		brief.e
+	- Proves data can successfully be imported and processed, however 
+	output does not provide useful insight required as per the brief
 
 Version 2.0
 	- For each month of data set, a range of data is extracted and/or 	
@@ -13,5 +14,14 @@ Version 2.0
 		- Added polyfit plotting 
 		- Replaced "magic number" with height of table for 
 		compatability
+		
+		V2.3
+
+Version 3.0
+	- Reworked flow control
+	- Added functions for calculating percentages
+	- Reduced line count for main code
+	- Added plotting capability/usefulness 
+	- Plotting unfinished
 
 	

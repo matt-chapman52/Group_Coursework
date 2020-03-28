@@ -9,6 +9,7 @@ cleanedData = rmmissing(data);
 
 handForce = [];
 pushForceArray = table2array(cleanedData(:,8)); % Creating an array of just the force to then calculate the force at the users hand
+% 8 is used since the push force exists in column 8
 
 for a = 1:height(cleanedData)
     

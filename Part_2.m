@@ -6,13 +6,13 @@ dataFile = "HospitalData3.xlsx";                        % Stores data set filena
 dataSet = readtable(dataFile);                          % Reads the dataset and stores data into a table
 height = height(dataSet);
 
-plotData = struct;                                 % Initialises percentageSet as a struct
-plotData.populations = (table2array(dataSet(:,2)))';                % Converts the table section containing population data into an array and stores to "populations2 array
+plotData = struct;                                      % Initialises percentageSet as a struct
+plotData.populations = (table2array(dataSet(:,2)))';    % Converts the table section containing population data into an array and stores to "populations2 array
 
-months = [1:height];                                        % Constructs array of intergers from 1 to 96 (length of dataset) **NOTE could use length()?
+months = [1:height];                                    % Constructs array of intergers from 1 to 96 (length of dataset) **NOTE could use length()?
 days = [1:28*height];
 
-for i = 1:height                                           % Main loop iterates through each data point of the set  
+for i = 1:height                                        % Main loop iterates through each data point of the set  
 
     monthData = dataSet{i, 2:9};
 
@@ -29,25 +29,37 @@ for i = 1:height                                           % Main loop iterates 
 end
 
 figure;
-plot(months, plotData.monthlyPercentages);           % Plots month-by-month percentage against months
+
+subplot(4,8,[1:4,9:12])
+axis1 = gca;
+axis1.YLim = [10 20];
+plot(axis1, months, plotData.monthlyPercentages, '--x', 'LineWidth', 0.5, 'MarkerSize', 5);               % Plots month-by-month percentage against months
+xlabel("Months After First Data Point");
+ylabel("Percentage of population");
+
+subplot(4, 8,[17:18,25:28])
+axis2 = gca;
+axis2.YLim = [0 10];
+plot(axis2, days, plotData.dailyPercentages, '--x', 'LineWidth', 0.5, 'MarkerSize', 5);
 
 figure;
-ax1 = gca;
-line(months, plotData.populations, 'Parent', ax1);                  % Plots population aginst months
+plot(months, plotData.populations);                      % Plots population aginst months
 xlabel("Months After First Data Point");
 ylabel("Population of Town");
 yyaxis right;
-ax1.YLim = [0 20]
-line(months, plotData.monthlyPercentages, 'Parent', ax1);
+ax1 = gca;
 
+%ax1.YLim = [0 20];
+line(months, plotData.monthlyPatients, 'Parent', ax1);
+%{
 
 ax2 = axes('Position', get(ax1, 'Position'),'XAxisLocation','top', 'YAxisLocation','right', 'Color', 'none');
-ax2.YLim = [0 20];
+ax2.YLim = [0 11];
 line(days, plotData.dailyPercentages, 'Parent', ax2);
 
 figure;
-plot(days, plotData.dailyPercentages);               % Plots patients in hospital against months
-
+plot(days, plotData.dailyPercentages);                   % Plots patients in hospital against months
+%}
 %{
 hold all;
 

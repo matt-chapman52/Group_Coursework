@@ -24,4 +24,7 @@ Version 3.0
 	- Added plotting capability/usefulness 
 	- Plotting unfinished
 
-	
+		V3.1
+		- Tidyed up uneeded lines
+		- Reduced line count in main loop
+		- Midway through adapting plotting - working towards a multiplot figure

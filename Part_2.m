@@ -73,7 +73,7 @@ f(x) = polyData(1)*x + polyData(2);
 findMonth = finverse(f);
 completionMonth = findMonth(2.5*10^5);
 plot(completionMonth, 2.5*10^5, 'ro');
-xline(completionMonth);
+xline(double(completionMonth),"label", "Month Of Completion");
 
 %-----------------------------------------
 function monthlyPercentage = calcMonthPercent(monthData)

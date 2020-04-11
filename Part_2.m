@@ -11,6 +11,7 @@ plotData.populations = (table2array(dataSet(:,2)))';    % Converts the table sec
 
 months = [1:height];                                    % Constructs array of intergers from 1 to 96 (length of dataset) **NOTE could use length()?
 monthsProjected = [months, [height+1:height+300]];
+maxPatients = input("Enter the daily patient capacity to complete expansion for: ");
 
 for i = 1:height                                        % Main loop iterates through each data point of the set  
 
@@ -71,10 +72,12 @@ yline(2.5*10^5);
 syms f(x);
 f(x) = polyData(1)*x + polyData(2);
 findMonth = finverse(f);
-completionMonth = findMonth(2.5*10^5);
-plot(completionMonth, 2.5*10^5, 'ro');
+maxPopulation = maxPatients/(max(plotData.dailyPercentages)/100);
+completionMonth = abs(findMonth(maxPopulation));
+plot(completionMonth, maxPopulation, 'ro');
 xline(double(completionMonth),"label", "Month Of Completion");
 
+fprintf("This expansion should be completed for 0%d/%d", mod((completionMonth-96),12), floor((completionMonth)/12)+2012);
 %-----------------------------------------
 function monthlyPercentage = calcMonthPercent(monthData)
     monthPop = monthData(1);
